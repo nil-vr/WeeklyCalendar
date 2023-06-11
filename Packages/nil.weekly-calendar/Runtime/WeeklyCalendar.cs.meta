@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 02b825d70e7416a4288097afb709e37b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _udonSharpBackingUdonBehaviour: {instanceID: 0}
+  - DayHeader: {fileID: 4634296335031477049, guid: 09f1cf8dbd172d64ba70f6a6a348394f,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
