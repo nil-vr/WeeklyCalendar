@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net7.0": {
+      "Microsoft.JSInterop": {
+        "type": "Direct",
+        "requested": "[7.0.7, )",
+        "resolved": "7.0.7",
+        "contentHash": "dfZWcwYuw2aVqtvAV9VC6D9LimVABI1Jmj5DqEhXcwWadFzWTDqfgngEi5GBJG+XZVnuRp2EG6nzllP8Nno3Lw=="
+      }
+    },
+    "net7.0/browser-wasm": {}
+  }
+}

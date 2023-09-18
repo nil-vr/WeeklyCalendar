@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          cache: true
+          cache-dependency-path: wasm-render/packages.lock.json
+          global-json-file: wasm-render/global.json
+
+      - name: Install workload
+        run: dotnet workload install wasm-tools
+
+      - name: Build wasm-render
+        run: |
+          cd wasm-render
+          dotnet restore --locked-mode
+          dotnet publish --no-restore -c Release
+          cd bin/Release/net7.0/browser-wasm/AppBundle
+          zip -r "../../../../../../wasm-render-${GITHUB_REF_NAME}.zip" .
+
+      - name: Build WeeklyCalendar
+        run: |
+          cd Packages/nil.weekly-calendar
+          zip -r "../../nil.weekly-calendar-${GITHUB_REF_NAME}.zip" .
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: wasm-render
+          path: wasm-render-${{ github.ref_name }}.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: nil.weekly-calendar
+          path: nil.weekly-calendar-${{ github.ref_name }}.zip
+
+  release:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags')
+    permissions:
+      contents: write
+    steps:
+      - name: Get wasm-render
+        uses: actions/download-artifact@v3
+        with:
+          name: wasm-render
+
+      - name: Get nil.weekly-calendar
+        uses: actions/download-artifact@v3
+        with:
+          name: nil.weekly-calendar
+
+      - name: Validate
+        run: |
+          version=$(jq -r .version < Packages/nil.weekly-calendar/package.json)
+          if [ "${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Packages/nil.weekly-calendar/package.json .version does not match tag name"
+            exit 1
+          fi
+
+      - name: Publish
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require("node:fs/promises");
+
+            const name = context.ref.replace(/^refs\/tags\//, '');
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: name,
+              draft: true,
+              generate_release_notes: true,
+            });
+            await github.request({
+              method: "POST",
+              url: release.data.upload_url,
+              headers: {
+                "content-type": "application/zip",
+              },
+              data: await fs.readFile(`nil.weekly-calendar-${name}.zip`),
+              name: `nil.weekly-calendar-${name}.zip`,
+            });
+            await github.request({
+              method: "POST",
+              url: release.data.upload_url,
+              headers: {
+                "content-type": "application/zip",
+              },
+              data: await fs.readFile(`wasm-render-${name}.zip`),
+              name: `wasm-render-${name}.zip`,
+            });
