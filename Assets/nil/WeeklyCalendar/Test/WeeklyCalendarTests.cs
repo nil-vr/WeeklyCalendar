@@ -77,7 +77,7 @@ namespace Tests
         public void ConvertZoneTimeToReal_ForImpossibleTime_ReturnsFalse()
         {
             // America/New_York goes straight from 1:59 to 3:00 on this date.
-            var success = GetCalendar().ConvertZoneTimeToReal(new DateTime(2024, 3, 10, 2, 30, 0, DateTimeKind.Unspecified), "America/New_York", out var none);
+            var success = GetCalendar().ConvertZoneTimeToReal(new DateTime(2024, 3, 10, 2, 30, 0, DateTimeKind.Unspecified), "America/New_York", out _);
             Assert.IsFalse(success);
         }
 
