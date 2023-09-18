@@ -11,6 +11,7 @@
     "url": "https://github.com/nil-vr/WeeklyCalendar",
     "vpmDependencies": {
         "com.vrchat.udonsharp": "^1.1.x",
+        "com.vrchat.worlds": "^3.3.x",
         "nil.qr": "^0.0.2"
     }
 }
