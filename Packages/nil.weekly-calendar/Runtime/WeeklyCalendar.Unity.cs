@@ -727,6 +727,7 @@ public class WeeklyCalendarEditor : Editor
         var newSource = EditorGUILayout.DelayedTextField("Source", behavior.Source.Get());
         if (newSource != behavior.Source.Get())
         {
+            Undo.RecordObject(target, "Changed source");
             behavior.Source = new VRCUrl(newSource);
 
             var source = new Uri(behavior.Source.Get());
@@ -740,38 +741,59 @@ public class WeeklyCalendarEditor : Editor
         behavior.ConfigurationShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.ConfigurationShown, "Configuration");
         if (behavior.ConfigurationShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Language = EditorGUILayout.TextField("Language (ISO 639-1)", behavior.Language);
             behavior.TimeZone = EditorGUILayout.TextField("Time Zone (IANA TZDB)", behavior.TimeZone);
             behavior.FirstDayOfWeek = (DayOfWeek)EditorGUILayout.EnumPopup("First day of week", behavior.FirstDayOfWeek);
             behavior.AutoUpdateMinutes = EditorGUILayout.IntField("Auto updated after (minutes)", behavior.AutoUpdateMinutes);
             EditorGUILayout.HelpBox("The calendar will automatically update if the time since the last update is greater than this value. Because VRChat does not allow worlds to save data, this means the time since the calendar was updated in Unity (ie the time since the world was uploaded if automatic updating on building is enabled).", MessageType.Info);
             behavior.StatusLoading = EditorGUILayout.TextField("Loading status message", behavior.StatusLoading);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed configuration");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.PrefabsShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.PrefabsShown, "Prefabs");
         if (behavior.PrefabsShown)
         {
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(target, "Changed day header");
             behavior.DayHeader = (GameObject)EditorGUILayout.ObjectField("Day Header", behavior.DayHeader, typeof(GameObject), false);
+            Undo.RecordObject(target, "Changed row (odd)");
             behavior.RowOdd = (GameObject)EditorGUILayout.ObjectField("Row (odd)", behavior.RowOdd, typeof(GameObject), false);
+            Undo.RecordObject(target, "Changed row (even)");
             behavior.RowEven = (GameObject)EditorGUILayout.ObjectField("Row (even)", behavior.RowEven, typeof(GameObject), false);
+            Undo.RecordObject(target, "Changed event");
             behavior.Event = (GameObject)EditorGUILayout.ObjectField("Event", behavior.Event, typeof(GameObject), false);
+            Undo.RecordObject(target, "Changed join link");
             behavior.JoinLink = (GameObject)EditorGUILayout.ObjectField("Join Link", behavior.JoinLink, typeof(GameObject), false);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed prefabs");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.SlotsShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.SlotsShown, "Slots");
         if (behavior.SlotsShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Header = (Transform)EditorGUILayout.ObjectField("Header", behavior.Header, typeof(Transform), true);
             behavior.DayHeaders = (Transform)EditorGUILayout.ObjectField("Day Headers", behavior.DayHeaders, typeof(Transform), true);
             behavior.Rows = (Transform)EditorGUILayout.ObjectField("Rows", behavior.Rows, typeof(Transform), true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed slots");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.SlotsDetailsShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.SlotsDetailsShown, "Slots/Details");
         if (behavior.SlotsDetailsShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Details = (Transform)EditorGUILayout.ObjectField("Details Window", behavior.Details, typeof(Transform), true);
             behavior.DetailsTitleFill = (Image)EditorGUILayout.ObjectField("Title Fill", behavior.DetailsTitleFill, typeof(Image), true);
             behavior.DetailsTitleText = (Text)EditorGUILayout.ObjectField("Title Text", behavior.DetailsTitleText, typeof(Text), true);
@@ -789,44 +811,64 @@ public class WeeklyCalendarEditor : Editor
             behavior.DetailsWorld = (Transform)EditorGUILayout.ObjectField("HashtaDetailsWorld", behavior.DetailsWorld, typeof(Transform), true);
             behavior.DetailsJoinHeading = (Transform)EditorGUILayout.ObjectField("Join Heading", behavior.DetailsJoinHeading, typeof(Transform), true);
             behavior.DetailsJoin = (Transform)EditorGUILayout.ObjectField("Join", behavior.DetailsJoin, typeof(Transform), true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed slots/details");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.SlotsQrShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.SlotsQrShown, "Slots/QR");
         if (behavior.SlotsQrShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Qr = (Transform)EditorGUILayout.ObjectField("QR Window", behavior.Qr, typeof(Transform), true);
             behavior.QrTitleFill = (Image)EditorGUILayout.ObjectField("Title Fill", behavior.QrTitleFill, typeof(Image), true);
             behavior.QrTitleText = (Text)EditorGUILayout.ObjectField("Title Text", behavior.QrTitleText, typeof(Text), true);
             behavior.QrText = (InputField)EditorGUILayout.ObjectField("Text", behavior.QrText, typeof(InputField), true);
             behavior.QrCode = (QrCode)EditorGUILayout.ObjectField("QR Code", behavior.QrCode, typeof(QrCode), true);
             behavior.QrLinkText = (InputField)EditorGUILayout.ObjectField("Link Text", behavior.QrLinkText, typeof(InputField), true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed slots/QR");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.SlotsAboutShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.SlotsAboutShown, "Slots/About");
         if (behavior.SlotsAboutShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.About = (Transform)EditorGUILayout.ObjectField("About Window", behavior.About, typeof(Transform), true);
             behavior.AboutTitleFill = (Image)EditorGUILayout.ObjectField("Title Fill", behavior.AboutTitleFill, typeof(Image), true);
             behavior.AboutName = (Text)EditorGUILayout.ObjectField("Name", behavior.AboutName, typeof(Text), true);
             behavior.AboutDescription = (Text)EditorGUILayout.ObjectField("Description", behavior.AboutDescription, typeof(Text), true);
             behavior.AboutMore = (QrButton)EditorGUILayout.ObjectField("More", behavior.AboutMore, typeof(QrButton), true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed slots/about");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.SlotsStatusShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.SlotsStatusShown, "Slots/Status");
         if (behavior.SlotsStatusShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.StatusLastUpdated = (Text)EditorGUILayout.ObjectField("Last Updated", behavior.StatusLastUpdated, typeof(Text), true);
             behavior.StatusError = (Text)EditorGUILayout.ObjectField("Error", behavior.StatusError, typeof(Text), true);
             behavior.StatusTimeZone = (Text)EditorGUILayout.ObjectField("Time Zone", behavior.StatusTimeZone, typeof(Text), true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed slots/status");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.DaysShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.DaysShown, "Days of the week");
         if (behavior.DaysShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Monday = EditorGUILayout.TextField("Monday", behavior.Monday);
             behavior.Tuesday = EditorGUILayout.TextField("Tuesday", behavior.Tuesday);
             behavior.Wednesday = EditorGUILayout.TextField("Wednesday", behavior.Wednesday);
@@ -834,12 +876,17 @@ public class WeeklyCalendarEditor : Editor
             behavior.Friday = EditorGUILayout.TextField("Friday", behavior.Friday);
             behavior.Saturday = EditorGUILayout.TextField("Saturday", behavior.Saturday);
             behavior.Sunday = EditorGUILayout.TextField("Sunday", behavior.Sunday);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed days of the week");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.ColorsShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.ColorsShown, "Colors");
         if (behavior.ColorsShown)
         {
+            EditorGUI.BeginChangeCheck();
             var length = EditorGUILayout.DelayedIntField("Count", behavior.Colors.Length);
             if (length != behavior.Colors.Length)
             {
@@ -849,23 +896,39 @@ public class WeeklyCalendarEditor : Editor
             {
                 behavior.Colors[i] = EditorGUILayout.ColorField($"Element {i}", behavior.Colors[i]);
             }
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed colors");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
         behavior.ThemeShown = EditorGUILayout.BeginFoldoutHeaderGroup(behavior.ThemeShown, "Theme");
         if (behavior.ThemeShown)
         {
+            EditorGUI.BeginChangeCheck();
             behavior.Focus = (Sprite)EditorGUILayout.ObjectField("Focus", behavior.Focus, typeof(Sprite), false);
             behavior.Blur = (Sprite)EditorGUILayout.ObjectField("Blur", behavior.Blur, typeof(Sprite), false);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Changed theme");
+            }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
+        EditorGUI.BeginChangeCheck();
         behavior.UpdateOnBuild = GUILayout.Toggle(behavior.UpdateOnBuild, "Update on build");
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Changed update on build");
+        }
 
         if (GUILayout.Button("Update now"))
         {
             behavior.UpdateData();
         }
+
+        PrefabUtility.RecordPrefabInstancePropertyModifications(target);
     }
 }
 

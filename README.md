@@ -36,9 +36,3 @@ You'll also want to copy the `events/meta.toml` file to the same location in you
 ## Customizations
 
 The U# component on the calendar has many customization options. Some of these options are references to child objects of the calendar. As long as you keep these references in tact, you can edit the child objects as well for additional customization. However, if you make too many customizations to the child objects, it may become difficult to upgrade to new versions of the calendar later.
-
-# Troubleshooting
-
-## Changes to the component settings don't save
-
-This seems like a bug in U#. If you unpack the prefab you will be able to change the settings.
