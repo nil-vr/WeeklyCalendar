@@ -156,57 +156,58 @@ public partial class WeeklyCalendar
         {
             if (confirmedList.DataList.Contains(dateStr))
             {
+                // Even if it's not normally scheduled, it's confirmed, so it's scheduled.
                 if (scheduled == null)
                 {
                     scheduled = new DataDictionary();
                     scheduledIsOwned = true;
                 }
+                else
+                {
+                    EnsureOwned(ref scheduled, ref scheduledIsOwned);
+                }
                 scheduled["confirmed"] = true;
             }
             else if (scheduled != null)
             {
-                if (!scheduledIsOwned)
-                {
-                    scheduled = scheduled.ShallowClone();
-                    scheduledIsOwned = true;
-                }
+                EnsureOwned(ref scheduled, ref scheduledIsOwned);
                 scheduled["confirmed"] = false;
             }
+        }
+
+        if (scheduled == null)
+        {
+            // We're sure the event is not scheduled, so just return now.
+            return true;
         }
 
         if ((evt.TryGetValue("startDate", TokenType.Double, out var startDatet) && inZone.ToUnixTimeSeconds() < startDatet.Double) ||
             (evt.TryGetValue("endDate", TokenType.Double, out var endDatet) && endDatet.Double < inZone.ToUnixTimeSeconds()) ||
             (evt.TryGetValue("weeks", TokenType.DataList, out var weekst) && !weekst.DataList.Contains((double)((date.Day - 1) / 7 + 1))))
         {
-            if (!scheduledIsOwned)
-            {
-                scheduled = scheduled.ShallowClone();
-                scheduledIsOwned = true;
-            }
+            EnsureOwned(ref scheduled, ref scheduledIsOwned);
             scheduled["hide"] = true;
         }
 
-        if (scheduled != null && !(scheduled.TryGetValue("confirmed", TokenType.Boolean, out var confirmedt) && confirmedt.Boolean) &&
+        if (!(scheduled.TryGetValue("confirmed", TokenType.Boolean, out var confirmedt) && confirmedt.Boolean) &&
             ((evt.TryGetValue("canceled", TokenType.Boolean, out var allCanceledt) && allCanceledt.Boolean) ||
             (evt.TryGetValue("canceled", TokenType.DataList, out var canceledt) && canceledt.DataList.Contains(dateStr))))
         {
-            if (!scheduledIsOwned)
-            {
-                scheduled = scheduled.ShallowClone();
-                scheduledIsOwned = true;
-            }
+            EnsureOwned(ref scheduled, ref scheduledIsOwned);
             scheduled["canceled"] = true;
         }
-
-        // Prevent warning about final unused write.
-        KeepAlive(scheduledIsOwned);
 
         return true;
     }
 
-    void KeepAlive(object _)
+    void EnsureOwned(ref DataDictionary value, ref bool isOwned)
     {
-        // UdonSharp doesn't support GC.KeepAlive.
+        if (isOwned)
+        {
+            return;
+        }
+        value = value.ShallowClone();
+        isOwned = true;
     }
 
 #if !COMPILER_UDONSHARP
