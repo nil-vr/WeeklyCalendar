@@ -18,9 +18,6 @@ using UnityEditor;
 #endif
 
 public partial class WeeklyCalendar : UdonSharpBehaviour
-#if UNITY_EDITOR && !COMPILER_UDONSHARP
-, IPreprocessCallbackBehaviour
-#endif
 {
     public GameObject DayHeader;
     public GameObject RowOdd;
@@ -701,19 +698,9 @@ public partial class WeeklyCalendar : UdonSharpBehaviour
     void LogError(object o) {
         Debug.LogError(o);
     }
-
-#if UNITY_EDITOR && !COMPILER_UDONSHARP
-    public bool OnPreprocess()
-    {
-        if (UpdateOnBuild)
-        {
-            UpdateData();
-        }
-        return true;
-    }
-#endif
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(WeeklyCalendar))]
 public class WeeklyCalendarEditor : Editor
 {
@@ -916,13 +903,6 @@ public class WeeklyCalendarEditor : Editor
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
 
-        EditorGUI.BeginChangeCheck();
-        behavior.UpdateOnBuild = GUILayout.Toggle(behavior.UpdateOnBuild, "Update on build");
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(target, "Changed update on build");
-        }
-
         if (GUILayout.Button("Update now"))
         {
             behavior.UpdateData();
@@ -931,5 +911,5 @@ public class WeeklyCalendarEditor : Editor
         PrefabUtility.RecordPrefabInstancePropertyModifications(target);
     }
 }
-
+#endif
 #endif
