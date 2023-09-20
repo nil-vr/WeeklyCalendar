@@ -153,5 +153,42 @@ namespace Tests
                 ["confirmed"] = false,
             }, scheduled);
         }
+
+        [Test]
+        public void GetEventTimeForDate_WhenScheduledForWeek_ReturnsScheduled()
+        {
+            var success = GetCalendar().GetEventTimeForDate(new DataDictionary
+            {
+                ["start"] = 1230.0,
+                ["sunday"] = new DataDictionary(),
+                ["weeks"] = new DataList {
+                    3.0,
+                },
+            }, DateTime.Parse("2023-05-21"), "America/New_York", out var time, out var scheduled);
+            Assert.IsTrue(success);
+            Assert.AreEqual(DateTimeOffset.Parse("2023-05-21T20:30:00.0000000-04:00"), time);
+            Assert.AreEqual(new DataDictionary(), scheduled);
+        }
+
+        [Test]
+        public void GetEventTimeForDate_WhenNotScheduledForWeek_ReturnsCanceled()
+        {
+            var success = GetCalendar().GetEventTimeForDate(new DataDictionary
+            {
+                ["start"] = 1230.0,
+                ["sunday"] = new DataDictionary(),
+                ["weeks"] = new DataList {
+                    1.0,
+                    2.0,
+                    4.0,
+                },
+            }, DateTime.Parse("2023-05-21"), "America/New_York", out var time, out var scheduled);
+            Assert.IsTrue(success);
+            Assert.AreEqual(DateTimeOffset.Parse("2023-05-21T20:30:00.0000000-04:00"), time);
+            Assert.AreEqual(new DataDictionary
+            {
+                ["hide"] = true,
+            }, scheduled);
+        }
     }
 }

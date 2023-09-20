@@ -175,7 +175,8 @@ public partial class WeeklyCalendar
         }
 
         if ((evt.TryGetValue("startDate", TokenType.Double, out var startDatet) && inZone.ToUnixTimeSeconds() < startDatet.Double) ||
-            (evt.TryGetValue("endDate", TokenType.Double, out var endDatet) && endDatet.Double < inZone.ToUnixTimeSeconds()))
+            (evt.TryGetValue("endDate", TokenType.Double, out var endDatet) && endDatet.Double < inZone.ToUnixTimeSeconds()) ||
+            (evt.TryGetValue("weeks", TokenType.DataList, out var weekst) && !weekst.DataList.Contains((double)((date.Day - 1) / 7 + 1))))
         {
             if (!scheduledIsOwned)
             {
@@ -187,8 +188,7 @@ public partial class WeeklyCalendar
 
         if (scheduled != null && !(scheduled.TryGetValue("confirmed", TokenType.Boolean, out var confirmedt) && confirmedt.Boolean) &&
             ((evt.TryGetValue("canceled", TokenType.Boolean, out var allCanceledt) && allCanceledt.Boolean) ||
-            (evt.TryGetValue("canceled", TokenType.DataList, out var canceledt) && canceledt.DataList.Contains(dateStr)) ||
-            (evt.TryGetValue("weeks", TokenType.DataList, out var weekst) && !weekst.DataList.Contains((double)((date.Day - 1) / 7 + 1)))))
+            (evt.TryGetValue("canceled", TokenType.DataList, out var canceledt) && canceledt.DataList.Contains(dateStr))))
         {
             if (!scheduledIsOwned)
             {
