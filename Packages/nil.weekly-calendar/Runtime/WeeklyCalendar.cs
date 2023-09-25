@@ -315,6 +315,9 @@ public partial class WeeklyCalendar
                 var occurrence = new DataDictionary();
 
                 occurrence["id"] = i;
+                occurrence["baseName"] = evt["name"].String;
+                // This is the original day of the week, in the event's time zone.
+                occurrence["day"] = (double)date.DayOfWeek;
                 CopyToken(occurrence, "name", evt, language, dayOfWeek);
                 CopyToken(occurrence, "duration", evt, language, dayOfWeek);
                 CopyToken(occurrence, "poster", evt, language, dayOfWeek);
