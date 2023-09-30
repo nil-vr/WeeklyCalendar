@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link data-trunk rel="scss" href="index.scss"/>
+        <link data-trunk rel="copy-dir" href="borders"/>
+        <link data-trunk rel="copy-dir" href="fonts"/>
+        <link data-trunk rel="copy-dir" href="../wasm-render/bin/Release/net7.0/browser-wasm/AppBundle" data-target-path="wasm-render" />
+
+        <!-- Browsers will only load latin until a non-latin character is encountered. -->
+        <link rel="preload" href="fonts/noto-sans-v30-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="fonts/noto-sans-jp-v52-japanese-regular.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href="fonts/noto-emoji-v46-emoji-regular.woff2" as="font" type="font/woff2" crossorigin />
+
+        <title>WeeklyCalendar</title>
+    </head>
+    <body>
+        <script type="module">
+            import { dotnet } from './wasm-render/dotnet.js';
+
+            let loaded = (async function load() {
+                const { getAssemblyExports, getConfig } = await dotnet.create();
+
+                let exports = await getAssemblyExports(getConfig().mainAssemblyName);
+
+                await dotnet.run();
+
+                return exports.Exports.Render;
+            })();
+
+            async function renderData(input, config) {
+                return (await loaded)(input, config);
+            }
+
+            window.renderData = renderData;
+        </script>
+    </body>
+</html>

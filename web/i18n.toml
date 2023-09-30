@@ -1,0 +1,4 @@
+fallback_language = "ja"
+
+[fluent]
+assets_dir = "i18n"

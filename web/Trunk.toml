@@ -1,0 +1,7 @@
+[[proxy]]
+rewrite = "/data.json"
+backend = "https://nil-vr.github.io/wc-undou/data.json"
+
+[[proxy]]
+rewrite = "/posters/"
+backend = "https://nil-vr.github.io/wc-undou/posters/"

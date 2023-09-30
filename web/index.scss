@@ -1,0 +1,217 @@
+@use "reset.css";
+
+// Noto Fonts
+
+/* noto-sans-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/noto-sans-v30-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* noto-sans-jp-regular - japanese */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/noto-sans-jp-v52-japanese-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* noto-emoji-regular - emoji */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Noto Emoji';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/noto-emoji-v46-emoji-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+// App styles
+
+html, button {
+  font-family: 'Noto Sans', 'Noto Sans JP', 'Noto Emoji';
+  font-size: 14pt;
+}
+
+body {
+  padding-bottom: 12pt;
+}
+
+body > h1 {
+  align-items: center;
+  background: #85540a;
+  color: #fff;
+  display: flex;
+  font-size: 14pt;
+  height: 25pt;
+  justify-content: center;
+}
+
+table {
+  table-layout: fixed;
+  width: 100vw;
+
+  thead > tr {
+    background: #85540a;
+    color: #fff;
+    height: 25pt;
+
+    th {
+      text-align: center;
+      vertical-align: middle;
+      
+      &:nth-child(1) {
+        width: 50pt;
+      }
+    }
+  }
+
+  tbody > tr {
+    td {
+      padding: 3.5pt 2.5pt;
+
+      ul > li {
+        text-align: center;
+        padding: 1.5pt 0;
+      }
+    }
+
+    &:nth-child(odd) {
+      background: #fff;
+    }
+
+    &:nth-child(even) {
+      background: #f8e19e;
+    }
+  }
+}
+
+.window {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+
+  border-image: url("borders/frame.png") 8 fill;
+  border-style: solid;
+  border-width: 4pt;
+  padding: 1pt;
+
+  .titlebar {
+    align-items: center;
+    background: linear-gradient(to right, #09226c, #a5c6f7);
+    color: #fff;
+    display: flex;
+    height: 23pt;
+    padding: 1pt;
+    margin-bottom: 1pt;
+
+    & > * {
+      margin-left: 1pt;
+    }
+
+    .icon {
+      width: 22pt;
+      text-align: center;
+    }
+
+    .title {
+      flex-grow: 1;
+    }
+
+    button {
+      background: none;
+      border-image: url("borders/button.png") 8 fill;
+      border-style: solid;
+      border-width: 4pt;
+      color: #323232;
+      padding: 0;
+      font-size: 12pt;
+      width: 26pt;
+      align-self: stretch;
+      line-height: 100%;
+
+      &:active {
+        border-image: url("borders/pressed.png") 8 fill;
+      }
+    }
+  }
+
+  .panel {
+    border-image: url("borders/cut out.png") 8 fill;
+    border-style: solid;
+    border-width: 4pt;
+    margin: -1pt;
+    display: flex;
+    gap: 10pt;
+
+    .poster {
+      width: auto;
+      height: auto;
+      max-width: 512pt;
+      max-height: 512pt;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 5pt;
+      max-width: 480pt;
+
+      ul {
+        list-style: disc inside;
+      }
+    }
+  }
+
+  .about {
+    display: flex;
+    flex-direction: column;
+    max-width: 480pt;
+    padding: 4pt 2pt;
+    gap: 2pt;
+
+    font-size: 10pt;
+
+    h1 {
+      align-self: center;
+      font-size: 14pt;
+    }
+
+    a {
+      align-self: center;
+    }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 2pt;
+    }
+  }
+}
+
+a {
+  cursor: pointer;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+
+  background: #d3d3d3;
+  color: #fff;
+
+  .spacer {
+    flex-grow: 1;
+  }
+}
+
+pre {
+  white-space: pre-wrap;
+}
