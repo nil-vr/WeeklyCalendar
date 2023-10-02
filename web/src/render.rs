@@ -4,7 +4,7 @@ use icu::calendar::types::IsoWeekday;
 use implicit_clone::unsync::IArray;
 use serde::Deserializer;
 use serde::{de::Visitor, Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, throw_str};
 use yew::prelude::*;
 use yew::suspense::{use_future_with_deps, SuspensionResult, UseFutureHandle};
 
@@ -17,6 +17,7 @@ pub(super) struct TimeSlot {
 }
 
 #[derive(Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct EventOccurrence {
     pub id: u16,
 
@@ -198,8 +199,10 @@ pub(super) fn use_rendered(
                 .await
                 .as_string()
                 .expect_throw("renderData didn't return a string");
-            let mut data: Vec<Rc<TimeSlot>> =
-                serde_json::from_str(&data).expect_throw("renderData returned unexpected data");
+            let mut data: Vec<Rc<TimeSlot>> = match serde_json::from_str(&data) {
+                Ok(data) => data,
+                Err(e) => throw_str(&format!("renderData returned unexpected data: {e}")),
+            };
             data.sort_unstable_by(|a, b| a.time.cmp(&b.time));
             IArray::from(data)
         },

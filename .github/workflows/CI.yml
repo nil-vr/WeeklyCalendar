@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-web:
     runs-on: ubuntu-latest
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -27,36 +27,181 @@ jobs:
           global-json-file: wasm-render/global.json
 
       - name: Install workload
-        run: dotnet workload install wasm-tools
+        run: |
+          cd wasm-render
+          dotnet workload restore
 
       - name: Build wasm-render
         run: |
           cd wasm-render
           dotnet restore --locked-mode
           dotnet publish --no-restore -c Release
-          cd bin/Release/net7.0/browser-wasm/AppBundle
-          zip -r "../../../../../../wasm-render-${GITHUB_REF_NAME}.zip" .
 
       - name: Build WeeklyCalendar
         run: |
           cd Packages/nil.weekly-calendar
           zip -r "../../nil.weekly-calendar-${GITHUB_REF_NAME}.zip" .
 
-      - name: Upload
-        uses: actions/upload-artifact@v3
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          name: wasm-render
-          path: wasm-render-${{ github.ref_name }}.zip
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            web
+
+      - name: Validate
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          cd web
+          version=$(cargo metadata --format-version 1 --no-deps | jq -r '(.packages | map(select(.name == "web")))[0].version')
+          if [ "${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Cargo.toml .version does not match tag name"
+            exit 1
+          fi
+
+      - name: cargo fmt
+        run: |
+          cd web
+          cargo fmt -- --check
+      - name: cargo clippy
+        run: |
+          cd web
+          cargo clippy -- -D clippy::all
+
+      - name: cargo build
+        run: |
+          cd web
+          cargo install --locked trunk
+          trunk build --release
+          cd dist
+          zip -r "../../web-${GITHUB_REF_NAME}.zip" .
 
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: nil.weekly-calendar
-          path: nil.weekly-calendar-${{ github.ref_name }}.zip
+          path: "nil.weekly-calendar-${{ github.ref_name }}.zip"
+          if-no-files-found: error
+          retention-days: '2'
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: web
+          path: "web-${{ github.ref_name }}.zip"
+          if-no-files-found: error
+          retention-days: '2'
+
+  build-compiler:
+    needs:
+      - build-web
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            compiler
+
+      - name: Validate
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          cd compiler
+          version=$(cargo metadata --format-version 1 --no-deps | jq -r '(.packages | map(select(.name == "wc-compiler")))[0].version')
+          if [ "${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Cargo.toml .version does not match tag name"
+            exit 1
+          fi
+
+      - name: Get web
+        uses: actions/download-artifact@v3
+        with:
+          name: web
+      - name: Extract web
+        run: |
+          mkdir -p web/dist
+          cd web/dist
+          unzip "../../web-${GITHUB_REF_NAME}.zip"
+
+      - name: cargo fmt
+        run: |
+          cd compiler
+          cargo fmt -- --check
+      - name: cargo clippy
+        run: |
+          cd compiler
+          cargo clippy -- -D clippy::all
+
+      - name: cargo build
+        run: |
+          cd compiler
+          cargo build --release
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: compiler-linux
+          path: compiler/target/release/wc-compiler
+          if-no-files-found: error
+          retention-days: '2'
+
+  build-compiler-win:
+    needs:
+      - build-compiler
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            compiler
+
+      - name: Get web
+        uses: actions/download-artifact@v3
+        with:
+          name: web
+      - name: Extract web
+        run: |
+          mkdir -p web/dist
+          cd web/dist
+          unzip "../../web-${GITHUB_REF_NAME}.zip"
+
+      - name: cargo build
+        run: |
+          cd compiler
+          cargo build --release
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: compiler-windows
+          path: compiler/target/release/wc-compiler.exe
+          if-no-files-found: error
+          retention-days: '2'
 
   release:
     needs:
-      - build
+      - build-web
+      - build-compiler
+      - build-compiler-win
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags')
     permissions:
@@ -65,15 +210,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get wasm-render
-        uses: actions/download-artifact@v3
-        with:
-          name: wasm-render
-
       - name: Get nil.weekly-calendar
         uses: actions/download-artifact@v3
         with:
           name: nil.weekly-calendar
+
+      - name: Get compiler-linux
+        uses: actions/download-artifact@v3
+        with:
+          name: compiler-linux
+
+      - name: Get compiler-windows
+        uses: actions/download-artifact@v3
+        with:
+          name: compiler-windows
 
       - name: Validate
         run: |
@@ -110,8 +260,17 @@ jobs:
               method: "POST",
               url: release.data.upload_url,
               headers: {
-                "content-type": "application/zip",
+                "content-type": "application/octet-stream",
               },
-              data: await fs.readFile(`wasm-render-${name}.zip`),
-              name: `wasm-render-${name}.zip`,
+              data: await fs.readFile(`wc-compiler`),
+              name: `wc-compiler`,
+            });
+            await github.request({
+              method: "POST",
+              url: release.data.upload_url,
+              headers: {
+                "content-type": "application/octet-stream",
+              },
+              data: await fs.readFile(`wc-compiler.exe`),
+              name: `wc-compiler.exe`,
             });
