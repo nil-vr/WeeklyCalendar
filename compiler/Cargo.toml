@@ -23,7 +23,7 @@ smallvec = { version = "1.10.0", features = ["serde"] }
 tar = { version = "0.4.40", default-features = false }
 tempfile = "3.5.0"
 thiserror = "1.0.40"
-toml = { version = "0.7.3", features = ["parse"] }
+toml = { version = "0.8.8", features = ["parse"] }
 
 [build-dependencies]
 flate2 = "1.0.27"

@@ -7,7 +7,7 @@ use implicit_clone::unsync::IArray;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{window, Response};
-use yew::{prelude::*, suspense::use_future_with_deps};
+use yew::{prelude::*, suspense::use_future_with};
 
 use crate::{
     about::About,
@@ -35,26 +35,23 @@ pub(super) struct CalendarProps {
 
 #[function_component]
 pub(super) fn Calendar(props: &CalendarProps) -> HtmlResult {
-    let data = use_future_with_deps(
-        |url| async move {
-            let response: Response =
-                match JsFuture::from(window().unwrap().fetch_with_str(url.as_str())).await {
-                    Ok(response) => response.dyn_into().unwrap(),
-                    Err(error) => wasm_bindgen::throw_val(error),
-                };
-            if response.status() != 200 {
-                wasm_bindgen::throw_str("Server error");
-            }
-            let data = JsFuture::from(response.text().unwrap())
-                .await
-                .expect_throw("Network error")
-                .as_string()
-                .unwrap();
-            let parsed: Data = serde_json::from_str(&data).expect_throw("Invalid calendar data");
-            (AttrValue::from(data), parsed.meta)
-        },
-        props.data_url.clone(),
-    )?;
+    let data = use_future_with(props.data_url.clone(), |url| async move {
+        let response: Response =
+            match JsFuture::from(window().unwrap().fetch_with_str(url.as_str())).await {
+                Ok(response) => response.dyn_into().unwrap(),
+                Err(error) => wasm_bindgen::throw_val(error),
+            };
+        if response.status() != 200 {
+            wasm_bindgen::throw_str("Server error");
+        }
+        let data = JsFuture::from(response.text().unwrap())
+            .await
+            .expect_throw("Network error")
+            .as_string()
+            .unwrap();
+        let parsed: Data = serde_json::from_str(&data).expect_throw("Invalid calendar data");
+        (AttrValue::from(data), parsed.meta)
+    })?;
 
     let rendered = use_rendered(RenderParams {
         data: data.0.clone(),
@@ -153,16 +150,12 @@ pub(super) fn Calendar(props: &CalendarProps) -> HtmlResult {
         .and_then(|m| m.title.clone())
         .or_else(|| data.1.meta.title.clone());
 
-    use_effect_with_deps(
-        |name| {
-            if let (Some(document), Some(name)) =
-                (window().and_then(|w| w.document()), name.as_deref())
-            {
-                document.set_title(name);
-            }
-        },
-        name.clone(),
-    );
+    use_effect_with(name.clone(), |name| {
+        if let (Some(document), Some(name)) = (window().and_then(|w| w.document()), name.as_deref())
+        {
+            document.set_title(name);
+        }
+    });
 
     let show_about = {
         let selected = selected.clone();

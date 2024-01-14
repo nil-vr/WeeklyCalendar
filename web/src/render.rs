@@ -6,7 +6,8 @@ use serde::Deserializer;
 use serde::{de::Visitor, Deserialize, Serialize};
 use wasm_bindgen::{prelude::*, throw_str};
 use yew::prelude::*;
-use yew::suspense::{use_future_with_deps, SuspensionResult, UseFutureHandle};
+use yew::suspense::{use_future_with, SuspensionResult, UseFutureHandle};
+use yew::virtual_dom::VText;
 
 use crate::Days;
 
@@ -166,6 +167,12 @@ impl Display for MinuteTime {
     }
 }
 
+impl ToHtml for MinuteTime {
+    fn to_html(&self) -> Html {
+        Html::VText(VText::new(self.to_string()))
+    }
+}
+
 #[wasm_bindgen]
 extern "C" {
     async fn renderData(input: &str, config: &str) -> JsValue;
@@ -190,22 +197,19 @@ pub(super) struct RenderConfig {
 pub(super) fn use_rendered(
     input: RenderParams,
 ) -> SuspensionResult<UseFutureHandle<IArray<Rc<TimeSlot>>>> {
-    use_future_with_deps(
-        |d| async move {
-            let config = serde_json::to_string(&d.config).unwrap();
+    use_future_with(input, |d| async move {
+        let config = serde_json::to_string(&d.config).unwrap();
 
-            let f = renderData(&d.data, &config);
-            let data = f
-                .await
-                .as_string()
-                .expect_throw("renderData didn't return a string");
-            let mut data: Vec<Rc<TimeSlot>> = match serde_json::from_str(&data) {
-                Ok(data) => data,
-                Err(e) => throw_str(&format!("renderData returned unexpected data: {e}")),
-            };
-            data.sort_unstable_by(|a, b| a.time.cmp(&b.time));
-            IArray::from(data)
-        },
-        input,
-    )
+        let f = renderData(&d.data, &config);
+        let data = f
+            .await
+            .as_string()
+            .expect_throw("renderData didn't return a string");
+        let mut data: Vec<Rc<TimeSlot>> = match serde_json::from_str(&data) {
+            Ok(data) => data,
+            Err(e) => throw_str(&format!("renderData returned unexpected data: {e}")),
+        };
+        data.sort_unstable_by(|a, b| a.time.cmp(&b.time));
+        IArray::from(data)
+    })
 }
