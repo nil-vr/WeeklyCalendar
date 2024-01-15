@@ -5,7 +5,7 @@
         <link data-trunk rel="scss" href="index.scss"/>
         <link data-trunk rel="copy-dir" href="borders"/>
         <link data-trunk rel="copy-dir" href="fonts"/>
-        <link data-trunk rel="copy-dir" href="../wasm-render/bin/Release/net7.0/browser-wasm/AppBundle" data-target-path="wasm-render" />
+        <link data-trunk rel="copy-dir" href="../wasm-render/bin/Release/net8.0/browser-wasm/AppBundle" data-target-path="wasm-render" />
 
         <!-- Browsers will only load latin until a non-latin character is encountered. -->
         <link rel="preload" href="fonts/noto-sans-v30-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
@@ -16,7 +16,7 @@
     </head>
     <body>
         <script type="module">
-            import { dotnet } from './wasm-render/dotnet.js';
+            import { dotnet } from './wasm-render/_framework/dotnet.js';
 
             let loaded = (async function load() {
                 const { getAssemblyExports, getConfig } = await dotnet.create();
