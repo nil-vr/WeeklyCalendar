@@ -1,7 +1,9 @@
 /[Aa]ssets/SerializedUdonPrograms/
 /[Aa]ssets/SerializedUdonPrograms.meta
 /[Ll]ibrary/
+/[Ll]ogs/
 /obj/
 /[Tt]emp/
+/[Uu]ser[Ss]ettings/
 /*.csproj
 /*.sln

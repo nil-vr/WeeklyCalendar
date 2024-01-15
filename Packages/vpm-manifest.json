@@ -1,49 +1,18 @@
 {
   "dependencies": {
-    "com.vrchat.udonsharp": {
-      "version": "1.1.8"
-    },
-    "com.vrchat.clientsim": {
-      "version": "1.2.5"
-    },
-    "com.vrchat.base": {
-      "version": "^3.1.x"
-    },
-    "com.vrchat.worlds": {
-      "version": "^3.1.x"
-    },
     "com.vrchat.core.vpm-resolver": {
       "version": "0.1.19"
     },
     "nil.qr": {
       "version": "0.0.2"
+    },
+    "com.vrchat.worlds": {
+      "version": "3.5.0"
     }
   },
   "locked": {
-    "com.vrchat.udonsharp": {
-      "version": "1.1.9",
-      "dependencies": {
-        "com.vrchat.worlds": "^3.1.x"
-      }
-    },
-    "com.vrchat.worlds": {
-      "version": "3.3.0",
-      "dependencies": {
-        "com.vrchat.base": "3.3.0"
-      }
-    },
-    "com.vrchat.base": {
-      "version": "3.3.0",
-      "dependencies": {}
-    },
-    "com.vrchat.clientsim": {
-      "version": "1.2.7",
-      "dependencies": {
-        "com.vrchat.worlds": "^3.2.2"
-      }
-    },
     "com.vrchat.core.vpm-resolver": {
-      "version": "0.1.21",
+      "version": "0.1.27",
       "dependencies": {}
     },
     "nil.qr": {
@@ -51,6 +20,16 @@
       "dependencies": {
         "com.vrchat.udonsharp": "^1.1.x"
       }
+    },
+    "com.vrchat.worlds": {
+      "version": "3.5.0",
+      "dependencies": {
+        "com.vrchat.base": "3.5.0"
+      }
+    },
+    "com.vrchat.base": {
+      "version": "3.5.0",
+      "dependencies": {}
     }
   }
 }
