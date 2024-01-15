@@ -23,7 +23,7 @@ public partial class WeeklyCalendar
     bool ConvertRealTimeToZone(DateTimeOffset time, string zoneName, out DateTimeOffset inZone)
     {
         inZone = default;
-        var tsm = time.ToUnixTimeSeconds() / 60;
+        var ts = time.ToUnixTimeSeconds();
         if (!Zones.TryGetValue(zoneName, TokenType.DataDictionary, out var zonet))
         {
             LogError("Found event with missing time zone");
@@ -47,7 +47,7 @@ public partial class WeeklyCalendar
             var offset = offsett.DataDictionary;
             if (offset.TryGetValue("s", TokenType.Double, out var startt))
             {
-                if (startt.Double > tsm)
+                if (startt.Double > ts)
                 {
                     break;
                 }
