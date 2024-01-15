@@ -1,10 +1,8 @@
 #if VRC_SDK_VRCSDK3
 using System;
-using System.Collections;
 using Nil.Qr;
 using UdonSharp;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using VRC.SDK3.Data;
 using VRC.SDK3.Image;
@@ -13,11 +11,15 @@ using VRC.SDKBase;
 using VRC.Udon.Common.Interfaces;
 
 #if UNITY_EDITOR
+using System.Net.Http;
 using UdonSharpEditor;
 using UnityEditor;
 #endif
 
 public partial class WeeklyCalendar : UdonSharpBehaviour
+#if UNITY_EDITOR && !COMPILER_UDONSHARP
+    , IPreprocessCallbackBehaviour
+#endif
 {
     public GameObject DayHeader;
     public GameObject RowOdd;
@@ -152,29 +154,30 @@ public partial class WeeklyCalendar : UdonSharpBehaviour
     }
 
     // Don't call it `Update` because that's a reserved name in Unity.
+#if COMPILER_UDONSHARP
     public void UpdateData()
     {
-#if COMPILER_UDONSHARP
         VRCStringDownloader.LoadUrl(Source, (VRC.Udon.Common.Interfaces.IUdonEventReceiver)this);
-#else
-        // We can't use VRCStringDownloader in edit mode because it requires an IUdonEventReceiver
-        // and UdonSharpBehavior doesn't implement it.
-        IEnumerator Download(string source)
-        {
-            var request = UnityWebRequest.Get(source);
-            yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
-            {
-                Debug.LogError(request.error);
-            }
-            else
-            {
-                InitFromJson(request.downloadHandler.text, true, GetTime());
-            }
-        }
-        StartCoroutine(Download(Source.Get()));
-#endif
     }
+#else
+    public bool UpdateData()
+    {
+        var client = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(10)
+        };
+        var task = client.GetStringAsync(Source.Get());
+        task.Wait();
+        if (task.IsFaulted)
+        {
+            Debug.LogError(task.Exception.InnerException);
+            return false;
+        }
+        var response = task.Result;
+        InitFromJson(response, true, GetTime());
+        return true;
+    }
+#endif
 
     public override void OnStringLoadSuccess(IVRCStringDownload result)
     {
@@ -698,6 +701,20 @@ public partial class WeeklyCalendar : UdonSharpBehaviour
     void LogError(object o) {
         Debug.LogError(o);
     }
+
+#if UNITY_EDITOR && !COMPILER_UDONSHARP
+    public bool OnPreprocess()
+    {
+        if (UpdateOnBuild)
+        {
+            return UpdateData();
+        }
+        else
+        {
+            return true;
+        }
+    }
+#endif
 }
 
 #if UNITY_EDITOR
@@ -902,6 +919,13 @@ public class WeeklyCalendarEditor : Editor
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
+
+        EditorGUI.BeginChangeCheck();
+        behavior.UpdateOnBuild = GUILayout.Toggle(behavior.UpdateOnBuild, "Update on build");
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Changed update on build");
+        }
 
         if (GUILayout.Button("Update now"))
         {
