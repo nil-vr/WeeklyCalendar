@@ -77,7 +77,7 @@ jobs:
           cd web
           cargo install --locked trunk
           trunk build --release --public-url 'xTRUNK_BUG668x'
-          sed -i 's!/xTRUNK_BUG668x/!!g' dist/index.html
+          sed -i 's!/xTRUNK_BUG668x/!./!g' dist/index.html
           cd dist
           zip -r "../../web-${GITHUB_REF_NAME}.zip" .
 

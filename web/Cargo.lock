@@ -2080,7 +2080,7 @@ checksum = "4d91413b1c31d7539ba5ef2451af3f0b833a005eb27a631cec32bc0635a8602b"
 
 [[package]]
 name = "web"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "gloo 0.10.0",
  "i18n-embed",
