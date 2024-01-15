@@ -182,7 +182,7 @@ jobs:
         run: |
           mkdir -p web/dist
           cd web/dist
-          unzip "../../web-${GITHUB_REF_NAME}.zip"
+          unzip "../../web-${env:GITHUB_REF_NAME}.zip"
 
       - name: cargo build
         run: |
