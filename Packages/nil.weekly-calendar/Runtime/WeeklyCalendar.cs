@@ -317,7 +317,8 @@ public partial class WeeklyCalendar
                 occurrence["id"] = i;
                 occurrence["baseName"] = evt["name"].String;
                 // This is the original day of the week, in the event's time zone.
-                occurrence["day"] = (double)date.DayOfWeek;
+                // This needs two casts because of a U# bug.
+                occurrence["day"] = (double)(int)date.DayOfWeek;
                 CopyToken(occurrence, "name", evt, language, dayOfWeek);
                 CopyToken(occurrence, "duration", evt, language, dayOfWeek);
                 CopyToken(occurrence, "poster", evt, language, dayOfWeek);
