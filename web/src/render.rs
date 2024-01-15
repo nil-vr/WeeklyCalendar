@@ -54,7 +54,7 @@ where
         where
             E: serde::de::Error,
         {
-            IsoWeekday::try_from(v as usize).map_err(E::custom)
+            Ok(IsoWeekday::from(v as usize))
         }
     }
     deserializer.deserialize_u64(WeekdayVisitor)

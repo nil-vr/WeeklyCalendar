@@ -174,7 +174,7 @@ fn main() {
     _ = i18n_embed::select(&language_loader, &Localizations, &requested_languages);
 
     let language = requested_languages
-        .get(0)
+        .first()
         .map(|l| AttrValue::from(l.language.as_str().to_owned()))
         .unwrap_or(AttrValue::Static("ja"));
 
