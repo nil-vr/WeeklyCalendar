@@ -1,14 +1,20 @@
 {
   "version": 1,
   "dependencies": {
-    "net7.0": {
+    "net8.0": {
       "Microsoft.JSInterop": {
         "type": "Direct",
-        "requested": "[7.0.7, )",
-        "resolved": "7.0.7",
-        "contentHash": "dfZWcwYuw2aVqtvAV9VC6D9LimVABI1Jmj5DqEhXcwWadFzWTDqfgngEi5GBJG+XZVnuRp2EG6nzllP8Nno3Lw=="
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "ePBj1uoRa+KZnkQwB3Cjxq025QT+erIcDgbDgc+yGb0FCzrE38gSBWMfbwlASPX1fifMnCwHzYvt2/gUFVp3qw=="
+      },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "ADdJXuKNjwZDfBmybMnpvwd5CK3gp92WkWqqeQhW4W+q4MO3Qaa9QyW2DcFLAvCDMcCWxT5hRXqGdv13oon7nA=="
       }
     },
-    "net7.0/browser-wasm": {}
+    "net8.0/browser-wasm": {}
   }
 }
