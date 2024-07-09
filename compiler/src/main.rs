@@ -829,9 +829,7 @@ fn guess_poster(event: &Event, files: &BTreeSet<PathBuf>) -> Option<PathBuf> {
     let mut image_extensions = ["webp", "jpeg", "jpg", "png"].into_iter();
     let mut image_path = PathBuf::from(event.source.path);
     let found = loop {
-        let Some(extension) = image_extensions.next() else {
-            return None;
-        };
+        let extension = image_extensions.next()?;
         image_path.set_extension(extension);
         if files.contains(&image_path) {
             break image_path.clone();
