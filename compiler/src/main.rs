@@ -601,8 +601,8 @@ fn prepare_event<'a, 'b>(
             ..convert_event_info(&event.event.info, posters)
         },
         timezone: event.event.timezone.as_ref().as_ref(),
-        start: (event.event.start.0 - NaiveTime::default()).num_minutes() as i32,
-        duration: event.event.duration.0.num_minutes() as i32,
+        start: event.event.start.into(),
+        duration: event.event.duration.into(),
         platforms: &event.event.platforms,
         days: convert_event_days(&event.event.days, posters),
         languages,
@@ -797,7 +797,8 @@ fn convert_event_day<'a>(
 ) -> output::EventDay<'a> {
     output::EventDay {
         name: value.info.name.as_deref(),
-        duration: value.duration.map(|d| d.0.num_minutes() as i32),
+        start: value.start.map(Into::into),
+        duration: value.duration.map(Into::into),
         info: convert_event_info(&value.info, posters),
     }
 }

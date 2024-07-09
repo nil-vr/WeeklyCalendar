@@ -23,8 +23,8 @@ pub struct Event<'a> {
     pub info: EventInfo<'a>,
     #[serde(rename = "tz")]
     pub timezone: &'a str,
-    pub start: i32,
-    pub duration: i32,
+    pub start: Minutes,
+    pub duration: Minutes,
     pub platforms: &'a [Platform],
     #[serde(flatten)]
     pub days: EventDays<'a>,
@@ -59,7 +59,9 @@ pub struct EventDay<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub duration: Option<i32>,
+    pub start: Option<Minutes>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<Minutes>,
     #[serde(flatten)]
     pub info: EventInfo<'a>,
 }
@@ -168,3 +170,7 @@ pub enum Hashtag<'a> {
     Safe(&'a str),
     Escaped { display: &'a str, escaped: String },
 }
+
+#[derive(Serialize)]
+#[serde(transparent)]
+pub struct Minutes(pub i32);

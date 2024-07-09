@@ -8,7 +8,7 @@ use serde::{
 use smallvec::{smallvec, SmallVec};
 use toml::Spanned;
 
-use crate::{Language, Platform, User, World};
+use crate::{output::Minutes, Language, Platform, User, World};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -173,6 +173,18 @@ impl<'de> Deserialize<'de> for Time<Duration> {
             }
         };
         Ok(Time(Duration::minutes(minutes as i64)))
+    }
+}
+
+impl From<Time<NaiveTime>> for Minutes {
+    fn from(value: Time<NaiveTime>) -> Self {
+        Minutes((value.0 - NaiveTime::default()).num_minutes() as i32)
+    }
+}
+
+impl From<Time<Duration>> for Minutes {
+    fn from(value: Time<Duration>) -> Self {
+        Minutes(value.0.num_minutes() as i32)
     }
 }
 
