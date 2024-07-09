@@ -75,9 +75,8 @@ jobs:
       - name: cargo build
         run: |
           cd web
-          cargo install --locked trunk
-          trunk build --release --public-url 'xTRUNK_BUG668x'
-          sed -i 's!/xTRUNK_BUG668x/!./!g' dist/index.html
+          cargo install --locked trunk --version ^0.20
+          trunk build --release --public-url ./
           cd dist
           zip -r "../../web-${GITHUB_REF_NAME}.zip" .
 
@@ -235,7 +234,7 @@ jobs:
           fi
 
       - name: Publish
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require("node:fs/promises");
