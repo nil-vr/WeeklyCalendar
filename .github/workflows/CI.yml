@@ -17,10 +17,10 @@ jobs:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           cache: true
           cache-dependency-path: wasm-render/packages.lock.json
@@ -82,7 +82,7 @@ jobs:
           zip -r "../../web-${GITHUB_REF_NAME}.zip" .
 
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nil.weekly-calendar
           path: "nil.weekly-calendar-${{ github.ref_name }}.zip"
@@ -90,7 +90,7 @@ jobs:
           retention-days: '2'
 
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web
           path: "web-${{ github.ref_name }}.zip"
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
       - name: Rust
@@ -127,7 +127,7 @@ jobs:
           fi
 
       - name: Get web
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web
       - name: Extract web
@@ -151,7 +151,7 @@ jobs:
           cargo build --release
 
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compiler-linux
           path: compiler/target/release/wc-compiler
@@ -164,7 +164,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
       - name: Rust
@@ -176,7 +176,7 @@ jobs:
             compiler
 
       - name: Get web
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web
       - name: Extract web
@@ -191,7 +191,7 @@ jobs:
           cargo build --release
 
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compiler-windows
           path: compiler/target/release/wc-compiler.exe
@@ -209,20 +209,20 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get nil.weekly-calendar
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nil.weekly-calendar
 
       - name: Get compiler-linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: compiler-linux
 
       - name: Get compiler-windows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: compiler-windows
 
